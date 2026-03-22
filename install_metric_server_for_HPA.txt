@@ -1,0 +1,52 @@
+Step 1.
+- Firstly we need to install server meteric to see our CPU & memory utilization of our pods.
+so for that run cmd : 
+
+kubectl apply -f https://github.com/kubernetes-sigs/metrics-server/releases/latest/download/components.yaml
+
+this will install metric server on cluster.
+
+Step 2.
+- Now edit the deployment for adding the required metrics.
+
+run: 
+kubectl -n kube-system edit deployment metrics-server
+
+then - Add the security bypass to deployment under `container.args` as below :
+
+- --kubelet-insecure-tls
+- --kubelet-preferred-address-types=InternalIP,Hostname,ExternalIP
+
+
+Output should look like : 
+containers:
+      - args:
+        - --kubelet-insecure-tls
+        - --kubelet-preferred-address-types=InternalIP,Hostname,ExternalIP
+        - --cert-dir=/tmp
+        - --secure-port=10250
+        - --kubelet-preferred-address-types=InternalIP,ExternalIP,Hostname
+        - --kubelet-use-node-status-port
+        - --metric-resolution=15s
+
+
+now save that and then run step 3.
+
+Step 3.
+- Restart the deployment
+
+run:
+kubectl -n kube-system rollout restart deployment metrics-server
+
+Step 4. 
+- Verify if the metrics server is running
+
+run:
+kubectl get pods -n kube-system
+kubectl top nodes
+
+example : kubectl top pods -n prod-app-ns
+example: kubectl top pods -n ingress-nginx
+
+
+

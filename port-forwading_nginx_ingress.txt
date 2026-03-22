@@ -1,0 +1,35 @@
+step1 :
+- install nginx ingress controler to cluster:
+kubectl apply -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/main/deploy/static/provider/kind/deploy.yaml
+
+step2 :
+- verify the ingress ocntroller:
+kubectl get ns
+kubectl get svc -n ingress-nginx
+kubectl get pods -n ingress-nginx
+
+step3 :
+- run your applicaition ingress.yml fil (kubectl apply -f ingress.yml) 
+Note "define the path as app_one and app_two or etc.. cause the services & there ports (application port on which app. is running) play important role for both routing the services via ingress.
+
+step 4:
+-  run
+kubectl get ing -n prod-app-ns #"prod-app-ns is my applcaition namespace where my both services lie". "ing = ingress"
+
+step 5:
+- run
+kubectl port-forward svc/ingress-nginx-controller -n ingress-nginx 8000:80 --address=0.0.0.0
+
+the "svc/ingress-nginx-controller" is the LoadBalancer service for ingress, hence we are exposing it to world via 0.0.0.0, 8000 is the port on which i want to forward the traffic.
+
+example : http://localhost:8000/app_one
+example : http://localhost:8000/app_two
+
+this is how we access our applications.
+
+if we are running clusters on server then we can access application as:
+
+http://10.0.2.0:8000/app_one
+http://10.0.2.0:8000/app_two
+
+"10.0.2.0" is the public ipv address of our ec2 instance. just for example purpose.

@@ -1,0 +1,31 @@
+kind: Deployment
+apiVersion: apps/v1
+
+metadata:
+  name: app-one-deployment
+  namespace: prod-app-ns
+
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: prod-app-one
+  template:
+    metadata:
+      name: app-one-pod
+      namespace: prod-app-ns 
+      labels:
+        app: prod-app-one
+    spec:
+      containers:
+        - name: app-one-container
+          image: heyydhiraj/app_one:latest
+          ports:
+            - containerPort : 3000
+          resources:
+            requests:
+              cpu: 100m
+              memory: 128Mi
+            limits:
+              cpu: 200m
+              memory: 256Mi

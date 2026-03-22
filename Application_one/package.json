@@ -1,0 +1,12 @@
+{
+  "name": "devops-app-1",
+  "version": "1.0.0",
+  "description": "Node.js Status Dashboard - App 1",
+  "main": "app.js",
+  "scripts": {
+    "start": "node app.js"
+  },
+  "dependencies": {
+    "express": "^4.18.2"
+  }
+}

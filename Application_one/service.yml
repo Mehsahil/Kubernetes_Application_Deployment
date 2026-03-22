@@ -1,0 +1,15 @@
+kind: Service
+apiVersion: v1
+
+metadata:
+  name: app-one-svc
+  namespace: prod-app-ns
+
+spec:
+  selector:
+    app: prod-app-one
+  ports:
+    - port: 3000
+      targetPort: 3000
+      protocol: TCP
+  type: ClusterIP

@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>App_1 | Node.js Dashboard</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap');
+        
+        body { font-family: 'Inter', sans-serif; transition: all 0.4s ease; min-height: 100vh; position: relative; overflow-x: hidden; }
+        
+        /* Revised Themes */
+        body.dark { background-color: #020617; color: #f8fafc; }
+        body.purple { background-color: #1e0b38; color: #f5f3ff; }
+
+        /* Booming Dots Animation */
+        .dot {
+            position: absolute;
+            width: 4px; height: 4px;
+            background: rgba(255,255,255,0.4);
+            border-radius: 50%;
+            pointer-events: none;
+            animation: bloom 4s infinite ease-in-out;
+        }
+        @keyframes bloom {
+            0%, 100% { transform: scale(0); opacity: 0; }
+            50% { transform: scale(3.5); opacity: 0.8; }
+        }
+
+        /* Modern Toggle Button */
+        .toggle-btn {
+            position: fixed;
+            top: 20px; right: 20px;
+            padding: 10px 20px;
+            border-radius: 50px;
+            cursor: pointer;
+            z-index: 100;
+            font-weight: 600;
+            border: 1px solid rgba(255,255,255,0.2);
+            background: rgba(255,255,255,0.1);
+            color: white;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Gallery Grid */
+        .masonry {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 1.5rem;
+        }
+        .item { 
+            border-radius: 1.25rem; 
+            overflow: hidden; 
+            border: 1px solid rgba(255,255,255,0.1);
+            background: rgba(255,255,255,0.03);
+            height: 220px;
+            cursor: pointer;
+        }
+        .item img { width: 100%; height: 100%; object-fit: cover; transition: 0.4s; will-change: transform; }
+        .item:hover img { transform: scale(1.08); }
+
+        /* Combined Footer Box */
+        .bottom-box {
+            background: rgba(59, 130, 246, 0.15);
+            border: 1px solid rgba(59, 130, 246, 0.3);
+            backdrop-filter: blur(5px);
+        }
+
+        /* --- Fullscreen Modal Styling --- */
+        #lightbox {
+            display: none; /* Starts hidden */
+            position: fixed;
+            inset: 0;
+            z-index: 1000;
+            background: rgba(0, 0, 0, 0.9);
+            justify-content: center;
+            align-items: center;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+        #lightbox.active { display: flex; opacity: 1; }
+        
+        #lightbox-img {
+            max-width: 90%;
+            max-height: 90%;
+            border-radius: 1.25rem;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.7);
+            border: 2px solid white;
+        }
+
+        /* Blur page when active */
+        body.lightbox-open .z-10 {
+            filter: blur(10px);
+            transition: filter 0.3s ease;
+        }
+    </style>
+</head>
+<body class="dark">
+
+    <button class="toggle-btn" onclick="toggleTheme()">Switch to Purple</button>
+    <div id="particle-container"></div>
+
+    <div id="lightbox" onclick="closeLightbox()">
+        <img id="lightbox-img" src="" alt="Fullscreen View">
+    </div>
+
+    <div class="relative z-10 max-w-5xl mx-auto px-6 py-12">
+        <header class="mb-12 text-center">
+            <div class="flex items-center justify-center gap-3 mb-2">
+                <div class="h-3 w-3 bg-green-500 rounded-full shadow-[0_0_10px_#22c55e] animate-pulse"></div>
+                <h1 class="text-3xl font-black tracking-tight uppercase">System Operational</h1>
+            </div>
+            <p class="opacity-70">Hello Guys, welcome to this page. This confirms your application is running fine.</p>
+            
+            <div class="mt-6 inline-block px-4 py-1 rounded-full border border-blue-400/30 bg-blue-400/10 text-blue-400 font-mono text-sm font-bold">
+                ENVIRONMENT: PAGE_ONE (App_1)
+            </div>
+        </header>
+
+        <div class="masonry">
+            <div class="item" onclick="openLightbox(this)"><img src="https://images.pexels.com/photos/6424586/pexels-photo-6424586.jpeg?auto=compress&w=500" alt="Dev"></div>
+            <div class="item" onclick="openLightbox(this)"><img src="https://images.pexels.com/photos/6804091/pexels-photo-6804091.jpeg?auto=compress&w=500" alt="Kanban"></div>
+            <div class="item" onclick="openLightbox(this)"><img src="https://images.pexels.com/photos/4974916/pexels-photo-4974916.jpeg?auto=compress&w=500" alt="Work"></div>
+        </div>
+
+        <footer class="mt-20">
+            <div class="bottom-box p-6 rounded-3xl flex flex-col md:flex-row justify-between items-center gap-4">
+                <div class="text-center md:text-left">
+                    <p class="text-[10px] uppercase tracking-widest opacity-60 font-bold">Support & Queries</p>
+                    <a href="mailto:dhirajxspams@gmail.com" class="text-base font-semibold hover:text-blue-400 transition-colors">dhirajxspams@gmail.com</a>
+                </div>
+                <div class="text-center md:text-right">
+                    <p class="text-[10px] uppercase tracking-widest opacity-60 font-bold">Infrastructure Provisioned</p>
+                    <p class="text-lg font-extrabold italic">Uplinks By : Dhiraj Meshram</p>
+                </div>
+            </div>
+        </footer>
+    </div>
+
+    <script>
+        // --- Theme Logic ---
+        function toggleTheme() {
+            const body = document.body;
+            const btn = document.querySelector('.toggle-btn');
+            if(body.classList.contains('dark')) {
+                body.classList.replace('dark', 'purple');
+                btn.innerText = "Switch to Dark";
+            } else {
+                body.classList.replace('purple', 'dark');
+                btn.innerText = "Switch to Purple";
+            }
+        }
+
+        // --- Fullscreen Modal Logic ---
+        const lightbox = document.getElementById('lightbox');
+        const lightboxImg = document.getElementById('lightbox-img');
+
+        function openLightbox(element) {
+            const imgSrc = element.querySelector('img').src;
+            
+            // Optimization: Remove the thumbnail size constraint (?w=500) to get the largest possible image
+            const largeImgSrc = imgSrc.split('?')[0]; 
+
+            lightboxImg.src = largeImgSrc;
+            lightbox.classList.add('active');
+            document.body.classList.add('lightbox-open');
+        }
+
+        function closeLightbox() {
+            lightbox.classList.remove('active');
+            document.body.classList.remove('lightbox-open');
+        }
+
+        // Handle Escape key to close
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') closeLightbox();
+        });
+
+        // --- Particle Generation ---
+        const container = document.getElementById('particle-container');
+        for (let i = 0; i < 30; i++) {
+            const dot = document.createElement('div');
+            dot.className = 'dot';
+            dot.style.left = Math.random() * 100 + 'vw';
+            dot.style.top = Math.random() * 100 + 'vh';
+            dot.style.animationDelay = Math.random() * 5 + 's';
+            container.appendChild(dot);
+        }
+    </script>
+</body>
+</html>

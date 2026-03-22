@@ -1,0 +1,31 @@
+kind: Deployment
+apiVersion: apps/v1
+
+metadata:
+  name: app-two-deployment
+  namespace: prod-app-ns
+
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: prod-app-two
+  template:
+    metadata:
+      name: app-two-pod
+      namespace: prod-app-ns
+      labels:
+        app: prod-app-two
+    spec:
+      containers:
+        - name: app-two-container
+          image: heyydhiraj/app_two
+          ports:
+            - containerPort: 3001
+          resources:
+            requests:
+              cpu: 100m
+              memory: 128Mi
+            limits:
+              cpu: 200m
+              memory: 256Mi
